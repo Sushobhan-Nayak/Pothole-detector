@@ -40,7 +40,9 @@ dependencies:
   location: ^4.4.0
   cloud_firestore: 
   firebase_core:
-  camera: ^0.10.3+2
+  image_picker: ^0.8.7
+  gallery_saver: ^2.3.2
+  firebase_storage: ^11.0.16
   
 
 dev_dependencies:

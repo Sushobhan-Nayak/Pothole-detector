@@ -117,8 +117,7 @@ class _LiveLocationPageState extends State<LiveLocationPage> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      // drawer: buildDrawer(context, LiveLocationPage.route),
+      appBar: AppBar(centerTitle: true, title: const Text('Your location')),
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: Column(
