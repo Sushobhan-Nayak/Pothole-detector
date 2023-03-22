@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pothole_detector/map.dart';
+import 'package:pothole_detector/captureimage.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -23,11 +24,11 @@ class _HomeState extends State<Home> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const LiveLocationPage()),
+                          builder: (context) => const CaptureImage()),
                     );
                   },
                   child: const Text(
-                    'Report pothole',
+                    'Capture Pothole',
                     style: TextStyle(fontSize: 20),
                   )))
         ],
