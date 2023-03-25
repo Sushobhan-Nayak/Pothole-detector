@@ -1,14 +1,19 @@
+// ignore_for_file: avoid_print
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class LiveLocationPage extends StatefulWidget {
   static const String route = '/live_location';
 
-  const LiveLocationPage({Key? key}) : super(key: key);
+  const LiveLocationPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -33,6 +38,22 @@ class _LiveLocationPageState extends State<LiveLocationPage> {
     super.initState();
     _mapController = MapController();
     initLocationService();
+  }
+
+  void loading() {
+    const snackBar = SnackBar(
+      duration: Duration(seconds: 3),
+      content: Text('Loading......'),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void dataUploaded() {
+    const snackBar = SnackBar(
+      content: Text('Your data uploaded successfully!'),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pop(context);
   }
 
   void initLocationService() async {
@@ -105,8 +126,8 @@ class _LiveLocationPageState extends State<LiveLocationPage> {
 
     final markers = <Marker>[
       Marker(
-        width: 100,
-        height: 100,
+        width: 125,
+        height: 125,
         point: currentLatLng,
         builder: (context) => const Icon(
           Icons.location_on,
@@ -159,7 +180,28 @@ class _LiveLocationPageState extends State<LiveLocationPage> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             ElevatedButton(
-                onPressed: () {}, child: const Text('Send location')),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(Colors.red[700])),
+                onPressed: () async {
+                  ImagePicker imagePicker = ImagePicker();
+                  XFile? file =
+                      await imagePicker.pickImage(source: ImageSource.gallery);
+                  print('${file?.path}');
+                  loading();
+                  Reference referenceRoot = FirebaseStorage.instance.ref();
+                  Reference referenceDirImages = referenceRoot.child('images');
+
+                  Reference referenceImageToUpload = referenceDirImages.child(
+                      '(${currentLatLng.latitude}, ${currentLatLng.longitude})');
+
+                  try {
+                    await referenceImageToUpload.putFile(File(file!.path));
+                    dataUploaded();
+                  } catch (error) {
+                    print(error);
+                  }
+                },
+                child: const Text('Upload data')),
             const SizedBox(width: 145),
             FloatingActionButton(
               onPressed: () {

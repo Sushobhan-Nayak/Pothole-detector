@@ -1,10 +1,8 @@
 // ignore_for_file: avoid_print
-
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:pothole_detector/map.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,6 +12,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String imageUrl = '';
+  
+  void imageSaved() {
+    const snackBar = SnackBar(
+      content: Text('Image saved to gallery.'),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,62 +27,50 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         title: const Text('--- W E L C O M E ---'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(Colors.red[600])),
-                onPressed: () async {
-                  ImagePicker imagePicker = ImagePicker();
-                  XFile? file =
-                      await imagePicker.pickImage(source: ImageSource.camera);
-                  print('${file?.path}');
-
-                  if (file == null) return;
-                  String uniqueFileName =
-                      DateTime.now().millisecondsSinceEpoch.toString();
-
-                  Reference referenceRoot = FirebaseStorage.instance.ref();
-                  Reference referenceDirImages = referenceRoot.child('images');
-
-                  Reference referenceImageToUpload =
-                      referenceDirImages.child(uniqueFileName);
-
-                  try {
-                    await referenceImageToUpload.putFile(File(file.path));
-                    imageUrl = await referenceImageToUpload.getDownloadURL();
-                  } catch (error) {
-                    print(error);
-                  }
-                },
-                child: const Text(
-                  'Upload image',
-                  style: TextStyle(fontSize: 20),
-                )),
-          ),
-          const Divider(
-            thickness: 1,
-            color: Colors.black,
-          ),
-          Center(
-            child: ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(Colors.red[600])),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LiveLocationPage()),
-                  );
-                },
-                child: const Text(
-                  'Send live location',
-                  style: TextStyle(fontSize: 20),
-                )),
-          ),
-        ],
+      body: Container(
+        decoration: const BoxDecoration(gradient: RadialGradient(colors: [Colors.white,Colors.orange],radius:1)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+              child: ElevatedButton(
+                  style: const ButtonStyle(
+                      backgroundColor: MaterialStatePropertyAll(Colors.blue)),
+                  onPressed: () async {
+                    ImagePicker imagePicker = ImagePicker();
+                    XFile? file =
+                        await imagePicker.pickImage(source: ImageSource.camera);
+                    print('${file?.path}');
+                    await GallerySaver.saveImage(file!.path);
+                    imageSaved();
+                  },
+                  child: const Text(
+                    'Capture image',
+                    style: TextStyle(fontSize: 20),
+                  )),
+            ),
+            const Divider(
+              thickness: 1,
+              color: Colors.black,
+            ),
+            Center(
+              child: ElevatedButton(
+                  style: const ButtonStyle(
+                      backgroundColor: MaterialStatePropoIHEFIHWEertyAll(Colors.blue)),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LiveLocationPage()),
+                    );
+                  },
+                  child: const Text(
+                    'Get live location',
+                    style: TextStyle(fontSize: 20),
+                  )),
+            ),
+          ],
+        ),
       ),
     );
   }
